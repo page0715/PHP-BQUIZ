@@ -8,79 +8,40 @@
     <link rel="stylesheet" href="../css/bootstrap.css">
 </head>
 <body>
-<header class="container p-5">
+<header class="p-5">
     <h1 class="text-center">投票結果</h1>
-</header>
-<main class="container p-3">
-<fieldset>
-    <legend>新增問卷</legend>
-    <form action="./api/add_que.php" method="post">
-    <!--主題-->
-    <div class="d-flex">
-        <div class="col-3 bg-light p-2">問卷名稱</div>
-        <div class="col-6 p-2">
-            <input type="text" name="subject" id="">
-        </div>      
-    </div>
-    <!--選項-->
-    <div class="bg-light">
-        <div class="p-2" id="option">
-            <label for="">選項</label>
-            <input type="text" name="opt[]">
-            <input type="button" value="更多" onclick="more()">
-        </div>
-    </div>
-    <div>
-        <input type="submit" value="新增">
-        <input type="reset" value="清空">
-    </div>
-    </form>
-</fieldset>
+</header>    
+<main class='container'>
+<?php 
+$subject=$Que->find($_GET['id']);
+?>
+<h2 class="text-center"><?=$subject['text'];?></h2>
 
-<fieldset>
-    <legend>問卷列表</legend>
-    <div class="col-9 mx-auto">
-    <table class="table">
-    <tr>
-        <td>編號</td>
-        <td>主題內容</td>
-        <td>操作</td>
-    </tr>
-    <?php
-    $ques=$Que->all(['subject_id'=>0]);
-    foreach($ques as $idx => $que){
+<ul class="list-group col-6 mx-auto">
+    <?php 
+    $opts=$Que->all(['subject_id'=>$_GET['id']]);
+    foreach($opts as $idx => $opt){
+        $div=($subject['count']>0)?$subject['count']:1;
+        $rate= round($opt['count']/$div,3);
     ?>
-    <tr>
-        <td><?=$idx+1;?></td>
-        <td><?=$que['text'];?></td>
-        <td>
-            <button class="btn btn-info">顯示</button>
-            <button class="btn btn-success">編輯</button>
-            <a href="./api/del.php?id=<?=$que['id'];?>">
-                <button class="btn btn-danger">刪除</button>
-            </a>
-        </td>
-    </tr>
+    <li class="list-group-item list-group-item-action d-flex">
+        <div class="col-6">
+            <?=$idx+1;?>. 
+            <?=$opt['text'];?>
+        </div>
+        <div class="col-6 d-flex">
+            <div class="col-8 bg-secondary" style="width:<?=$rate*0.667*100;?>%"></div>
+            <div class="col-4">&nbsp;&nbsp; <?=$opt['count'];?>票(<?=$rate*100;?>%)</div>
+        </div>
+    </li>
     <?php
     }
     ?>
-    </table>
-    </div>
-</fieldset>
+</ul>
+<button class="btn btn-primary d-block mx-auto my-5" onclick="location.href='index.php'">返回</button>
 
 </main>
-
 <script src="../js/jquery-3.4.1.min.js"></script>
-<script src="../js/bootstrap.js"></script>
+<script src="../js/bootstrap.js"></script>   
 </body>
 </html>
-<script>
-
-function more(){
-    let opt=`<div class="p-2">
-                <label for="">選項</label>
-                <input type="text" name="opt[]">
-            </div>`
-    $("#option").before(opt)
-}   
-</script>
